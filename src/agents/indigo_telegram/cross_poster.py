@@ -24,12 +24,18 @@ from typing import Optional
 
 import requests
 
+import tumblr_oauth_setup as _tumblr_oauth
+
 BLUESKY_HANDLE = os.environ.get("BLUESKY_HANDLE", "")
 BLUESKY_APP_PASSWORD = os.environ.get("BLUESKY_APP_PASSWORD", "")
 BLUESKY_PDS = "https://bsky.social"
 
 MASTODON_INSTANCE = os.environ.get("MASTODON_INSTANCE", "https://mastodon.social")
 MASTODON_ACCESS_TOKEN = os.environ.get("MASTODON_ACCESS_TOKEN", "")
+
+TUMBLR_ACCESS_TOKEN = os.environ.get("TUMBLR_ACCESS_TOKEN", "")
+TUMBLR_ACCESS_TOKEN_SECRET = os.environ.get("TUMBLR_ACCESS_TOKEN_SECRET", "")
+TUMBLR_BLOG_IDENTIFIER = os.environ.get("TUMBLR_BLOG_IDENTIFIER", "")
 
 
 def post_bluesky(text: str, image_path: Optional[Path]) -> bool:
@@ -114,17 +120,41 @@ def post_mastodon(text: str, image_path: Optional[Path]) -> bool:
         return False
 
 
+def post_tumblr(text: str, image_path: Optional[Path]) -> bool:
+    if not (TUMBLR_ACCESS_TOKEN and TUMBLR_ACCESS_TOKEN_SECRET and TUMBLR_BLOG_IDENTIFIER):
+        return False
+    url = f"https://api.tumblr.com/v2/blog/{TUMBLR_BLOG_IDENTIFIER}/post"
+    headers = {"Authorization": _tumblr_oauth.auth_header("POST", url, TUMBLR_ACCESS_TOKEN, TUMBLR_ACCESS_TOKEN_SECRET)}
+    try:
+        if image_path and image_path.exists():
+            with open(image_path, "rb") as f:
+                r = requests.post(
+                    url, headers=headers, data={"type": "photo", "caption": text[:500]}, files={"data": f}, timeout=30
+                )
+        else:
+            r = requests.post(url, headers=headers, data={"type": "text", "body": text[:500]}, timeout=20)
+        if not r.ok:
+            print(f"[ERR] tumblr: {r.text[:300]}")
+        return r.ok
+    except Exception as e:
+        print(f"[ERR] tumblr: {e}")
+        return False
+
+
 def cross_post(text: str, image_path: Optional[Path]) -> None:
     if post_bluesky(text, image_path):
         print("[OK] bluesky: posted")
     if post_mastodon(text, image_path):
         print("[OK] mastodon: posted")
+    if post_tumblr(text, image_path):
+        print("[OK] tumblr: posted")
 
 
 def demo():
-    """ponytail: no network — checks both posters no-op cleanly without creds."""
+    """ponytail: no network — checks all posters no-op cleanly without creds."""
     assert post_bluesky("test", None) is False
     assert post_mastodon("test", None) is False
+    assert post_tumblr("test", None) is False
     print("[demo] ok: cross_poster no-ops safely without credentials")
 
 

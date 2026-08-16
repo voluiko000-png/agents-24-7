@@ -33,3 +33,9 @@ jobs:
         run: python indigo_video.py
         # видео не коммитим обратно — они уже доставлены в Telegram, а свежая
         # озвучка/скрипт каждую неделю ценнее, чем кэш старых рендеров в git
+
+      - name: Upload same videos to YouTube Shorts
+        working-directory: src/agents/indigo_telegram
+        env:
+          YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+        run: python youtube_upload.py

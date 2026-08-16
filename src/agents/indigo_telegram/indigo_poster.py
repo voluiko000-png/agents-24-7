@@ -14,6 +14,7 @@
 import json
 import os
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -21,11 +22,13 @@ import requests
 BASE = Path(__file__).parent
 sys.path.insert(0, str(BASE))
 from llm import ask  # noqa: E402
+import cross_poster  # noqa: E402
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 API = f"https://api.telegram.org/bot{TOKEN}"
 CFG = BASE / "channels.json"
 IMAGES = BASE / "images"
+CROSS_POST_SAMPLE = int(os.environ.get("CROSS_POST_SAMPLE", "3"))
 
 STYLE_GUIDE = (
     "House style, follow strictly like a top-performing Telegram channel writer: "
@@ -117,6 +120,16 @@ def send(group_chat_id, ch: dict, text: str):
         print(f"[OK] {ch['name']}: posted{' (photo)' if img_path.exists() else ''}")
 
 
+def cross_post_slice(channels):
+    """ponytail: rotates a few topics through Bluesky/Mastodon each cycle instead
+    of mirroring all 50 (100 posts/day would spam a single-timeline account).
+    Full rotation ~17 days at CROSS_POST_SAMPLE=3, 2 cycles/day."""
+    if not channels:
+        return []
+    offset = int(datetime.now(timezone.utc).timestamp() // 3600) % len(channels)
+    return [channels[(offset + i) % len(channels)] for i in range(min(CROSS_POST_SAMPLE, len(channels)))]
+
+
 def main():
     data = load()
     if not data["group_chat_id"]:
@@ -126,11 +139,15 @@ def main():
     if not channels:
         print("Группа подключена, но ни одна тема ещё не создана — resolve_channels.py")
         return
+    cross_targets = {c["n"] for c in cross_post_slice(channels)}
     for ch in channels:
         try:
             text = build_post(ch)
             if text:
                 send(data["group_chat_id"], ch, text)
+                if ch["n"] in cross_targets:
+                    img_path = IMAGES / f"{ch['n']:02d}.jpg"
+                    cross_poster.cross_post(text, img_path if img_path.exists() else None)
         except Exception as e:
             print(f"[ERR] {ch['name']}: {e}")
 

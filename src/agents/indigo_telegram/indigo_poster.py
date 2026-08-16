@@ -14,6 +14,7 @@
 import json
 import os
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -104,20 +105,33 @@ def build_post(ch: dict) -> str:
     return (text or "").strip()
 
 
-def send(group_chat_id, ch: dict, text: str):
-    img_path = IMAGES / f"{ch['n']:02d}.jpg"
+def _post(img_path, group_chat_id, ch, text):
     if img_path.exists():
         with open(img_path, "rb") as f:
             payload = {"chat_id": group_chat_id, "message_thread_id": ch["topic_id"], "caption": text[:1024]}
-            r = requests.post(f"{API}/sendPhoto", data=payload, files={"photo": f}, timeout=60)
-    else:
-        payload = {"chat_id": group_chat_id, "message_thread_id": ch["topic_id"], "text": text}
-        r = requests.post(f"{API}/sendMessage", data=payload, timeout=30)
-    j = r.json()
-    if not j.get("ok"):
+            return requests.post(f"{API}/sendPhoto", data=payload, files={"photo": f}, timeout=60)
+    payload = {"chat_id": group_chat_id, "message_thread_id": ch["topic_id"], "text": text}
+    return requests.post(f"{API}/sendMessage", data=payload, timeout=30)
+
+
+def send(group_chat_id, ch: dict, text: str):
+    # ponytail: 50 topics posted back-to-back trip Telegram's per-chat flood limit
+    # (429 retry_after ~10-28s) — one retry after the wait Telegram itself asks for,
+    # here in the shared send path so every caller gets the fix, not just some.
+    img_path = IMAGES / f"{ch['n']:02d}.jpg"
+    for attempt in range(2):
+        r = _post(img_path, group_chat_id, ch, text)
+        j = r.json()
+        if j.get("ok"):
+            print(f"[OK] {ch['name']}: posted{' (photo)' if img_path.exists() else ''}")
+            return
+        if j.get("error_code") == 429 and attempt == 0:
+            wait = j.get("parameters", {}).get("retry_after", 5) + 1
+            print(f"[WAIT] {ch['name']}: flood limit, retrying in {wait}s")
+            time.sleep(wait)
+            continue
         print(f"[ERR] {ch['name']}: {j}")
-    else:
-        print(f"[OK] {ch['name']}: posted{' (photo)' if img_path.exists() else ''}")
+        return
 
 
 def cross_post_slice(channels):
@@ -145,6 +159,7 @@ def main():
             text = build_post(ch)
             if text:
                 send(data["group_chat_id"], ch, text)
+                time.sleep(1.2)  # ponytail: paces the burst so flood limit trips less often
                 if ch["n"] in cross_targets:
                     img_path = IMAGES / f"{ch['n']:02d}.jpg"
                     cross_poster.cross_post(text, img_path if img_path.exists() else None)

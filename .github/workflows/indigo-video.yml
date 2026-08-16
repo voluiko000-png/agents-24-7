@@ -1,0 +1,35 @@
+name: Indigo Telegram Cluster - Weekly Video
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # понедельник, 12:00 MSK
+  workflow_dispatch:
+
+jobs:
+  indigo-video:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Render and post weekly videos
+        working-directory: src/agents/indigo_telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          SAMBANOVA_API_KEY: ${{ secrets.SAMBANOVA_API_KEY }}
+        run: python indigo_video.py
+        # видео не коммитим обратно — они уже доставлены в Telegram, а свежая
+        # озвучка/скрипт каждую неделю ценнее, чем кэш старых рендеров в git

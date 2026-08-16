@@ -79,8 +79,10 @@ PROMPTS = {
         "advice or price predictions — education and awareness only."
     ),
     "viral_growth": (
-        "Write ONE short, exciting Telegram post (English) inviting people to join a giveaway/contest "
-        "themed around '{niche}'. Fun, high-energy, clear simple call to action to invite friends."
+        "Write ONE short, exciting Telegram post (English) about a giveaway/contest themed around "
+        "'{niche}'. Explicit invite mechanic: name a concrete number of friends to invite (e.g. 'invite "
+        "3 friends') and a concrete reward or leaderboard rank tied to it. Fun, high-energy, one clear "
+        "line telling exactly how to enter."
     ),
     "tma_game": (
         "Write ONE short, playful Telegram post (English) hyping up a tap/clicker mini-game themed "

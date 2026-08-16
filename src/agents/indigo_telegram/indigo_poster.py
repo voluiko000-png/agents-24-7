@@ -24,12 +24,23 @@ BASE = Path(__file__).parent
 sys.path.insert(0, str(BASE))
 from llm import ask  # noqa: E402
 import cross_poster  # noqa: E402
+import indigo_media  # noqa: E402
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 API = f"https://api.telegram.org/bot{TOKEN}"
 CFG = BASE / "channels.json"
 IMAGES = BASE / "images"
 CROSS_POST_SAMPLE = int(os.environ.get("CROSS_POST_SAMPLE", "3"))
+
+# 16.08.2026: Валера — "в посте должно быть четыре разных фотографии и одно
+# видео, такое как digital Katya, с озвучкой" (не одна закэшированная фотка
+# на канал навсегда, старый баг). CTA для видео/подписи по механике канала.
+CTA_BY_MECHANISM = {
+    "viral_growth": "Invite friends in Indigo Hub",
+    "tma_game": "Play now in Indigo Hub",
+    "credit_bot": "Try it in Indigo Hub",
+    "quiz_funnel": "Answer in Indigo Hub",
+}
 
 STYLE_GUIDE = (
     "House style, follow strictly like a top-performing Telegram channel writer: "
@@ -114,24 +125,53 @@ def _post(img_path, group_chat_id, ch, text):
     return requests.post(f"{API}/sendMessage", data=payload, timeout=30)
 
 
+def _post_media_group(group_chat_id, ch, items, text):
+    """items: [(path, 'photo'|'video'), ...] from indigo_media.build_post_media.
+    Reopens files fresh on every call so a 429-retry can just call this again."""
+    media, files = [], {}
+    for i, (path, kind) in enumerate(items):
+        key = f"m{i}"
+        entry = {"type": kind, "media": f"attach://{key}"}
+        if i == 0:
+            entry["caption"] = text[:1024]
+        media.append(entry)
+        files[key] = open(path, "rb")
+    try:
+        payload = {"chat_id": group_chat_id, "message_thread_id": ch["topic_id"], "media": json.dumps(media)}
+        return requests.post(f"{API}/sendMediaGroup", data=payload, files=files, timeout=180)
+    finally:
+        for f in files.values():
+            f.close()
+
+
 def send(group_chat_id, ch: dict, text: str):
     # ponytail: 50 topics posted back-to-back trip Telegram's per-chat flood limit
     # (429 retry_after ~10-28s) — one retry after the wait Telegram itself asks for,
     # here in the shared send path so every caller gets the fix, not just some.
     img_path = IMAGES / f"{ch['n']:02d}.jpg"
-    for attempt in range(2):
-        r = _post(img_path, group_chat_id, ch, text)
-        j = r.json()
-        if j.get("ok"):
-            print(f"[OK] {ch['name']}: posted{' (photo)' if img_path.exists() else ''}")
+    cta = CTA_BY_MECHANISM.get(ch["mechanism"], "Join Indigo Hub")
+    try:
+        items = indigo_media.build_post_media(ch, cta, img_path)
+    except Exception as e:
+        print(f"[WARN] {ch['name']}: gallery build failed, falling back to single photo: {e}")
+        items = []
+    try:
+        for attempt in range(2):
+            r = _post_media_group(group_chat_id, ch, items, text) if items else _post(img_path, group_chat_id, ch, text)
+            j = r.json()
+            if j.get("ok"):
+                kind = f"gallery+video, {len(items)} items" if items else ("photo" if img_path.exists() else "text")
+                print(f"[OK] {ch['name']}: posted ({kind})")
+                return
+            if j.get("error_code") == 429 and attempt == 0:
+                wait = j.get("parameters", {}).get("retry_after", 5) + 1
+                print(f"[WAIT] {ch['name']}: flood limit, retrying in {wait}s")
+                time.sleep(wait)
+                continue
+            print(f"[ERR] {ch['name']}: {j}")
             return
-        if j.get("error_code") == 429 and attempt == 0:
-            wait = j.get("parameters", {}).get("retry_after", 5) + 1
-            print(f"[WAIT] {ch['name']}: flood limit, retrying in {wait}s")
-            time.sleep(wait)
-            continue
-        print(f"[ERR] {ch['name']}: {j}")
-        return
+    finally:
+        indigo_media.cleanup(ch)
 
 
 def cross_post_slice(channels):

@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Генерирует по одному фото на тему (нишу) через Cloudflare Flux (бесплатно) —
+"""Генерирует по одному фото на тему (нишу) через Pollinations (Flux, бесплатно,
+без ключа и без карты -- image.pollinations.ai/prompt/... отвечает анонимно) --
 яркое, позитивное, фотографичное, без текста/логотипов (см. скилл
-bright-product-style). Кэширует в images/{n:02d}.jpg — idempotent, безопасно
+bright-product-style). Кэширует в images/{n:02d}.jpg -- idempotent, безопасно
 перезапускать: уже готовые темы пропускает, генерирует только новые/недостающие.
+
+16.08.2026: ушли с Cloudflare flux-1-schnell (Валера: "фото у нас косячены") --
+тот же Flux, но через Pollinations даёт заметно чище картинку и не требует
+токена вообще. Анонимный тариф -- 1 запрос/15с, поэтому пауза между вызовами.
 
 Запуск разово (и повторно при добавлении новых тем):
     python generate_topic_images.py
 Офлайн-проверка:
     python generate_topic_images.py --demo
 """
-import base64
-import os
 import json
+import random
 import sys
 import time
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 from PIL import Image
@@ -24,41 +29,53 @@ from PIL import Image
 BASE = Path(__file__).parent
 IMAGES = BASE / "images"
 CFG = BASE / "channels.json"
-CF_ACCOUNT_ID = "712103fd9046a3d9f5db3aba677aa20b"
-CF_TOKEN = os.environ["CLOUDFLARE_API_KEY"]
-CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+POLLINATIONS_MODEL = "flux"
+RATE_LIMIT_S = 16  # анонимный тариф Pollinations: 1 запрос/15с
 W = H = 1024
 
+# для видео (indigo_video.py) — каждый клип берёт свой ракурс, чтобы 10 картинок
+# на одну тему реально отличались друг от друга, а не были вариациями одного кадра
+VARIANT_ANGLES = [
+    "extreme close-up", "wide establishing shot", "overhead flat lay",
+    "hands interacting with objects", "side profile shot", "macro detail texture",
+    "in motion action shot", "symbolic still life composition",
+    "environmental wide context shot", "abstract artistic composition",
+]
 
-def build_prompt(niche: str) -> str:
+
+def build_prompt(niche: str, angle: str = None) -> str:
+    scene = f"bright vibrant photographic scene symbolizing {niche}"
+    if angle:
+        scene += f", {angle}"
     return (
-        f"bright vibrant photographic close-up scene symbolizing {niche}, objects, hands, nature "
-        "or abstract composition only, natural daylight, cheerful positive mood, real photo, high "
-        "detail, shallow depth of field, no screens, no monitors, no signage, no books, no papers, "
-        "no readable text or letters anywhere in the image, no logos, no watermark"
+        f"{scene}, objects, hands, nature or abstract composition only, natural daylight, "
+        "cheerful positive mood, real photo, high detail, shallow depth of field, no screens, "
+        "no monitors, no signage, no books, no papers, no readable text or letters anywhere in "
+        "the image, no logos, no watermark"
     )
 
 
-def generate(niche: str, attempt: int = 1) -> Image.Image:
-    url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/{CF_IMAGE_MODEL}"
-    r = requests.post(
-        url,
-        json={"prompt": build_prompt(niche)},
-        headers={"Authorization": f"Bearer {CF_TOKEN}"},
-        timeout=60,
+def generate(niche: str, angle: str = None, width: int = None, height: int = None,
+             attempt: int = 1) -> Image.Image:
+    w, h = width or W, height or H
+    seed = random.randint(1, 2_000_000_000)  # без seed Pollinations кэширует один и тот же кадр на промпт
+    url = (
+        f"https://image.pollinations.ai/prompt/{quote(build_prompt(niche, angle))}"
+        f"?width={w}&height={h}&model={POLLINATIONS_MODEL}&seed={seed}"
+        "&nologo=true&referrer=indigohub.local"
     )
-    if r.status_code == 429 and attempt < 5:
-        time.sleep(10 * attempt)
-        return generate(niche, attempt + 1)
+    r = requests.get(url, timeout=90)
+    if r.status_code in (429, 500) and attempt < 5:
+        time.sleep(RATE_LIMIT_S * attempt)
+        return generate(niche, angle, width, height, attempt + 1)
     r.raise_for_status()
-    raw = base64.b64decode(r.json()["result"]["image"])
-    img = Image.open(BytesIO(raw)).convert("RGB")
-    if img.width / img.height > 1:
-        img = img.resize((int(img.width * H / img.height), H))
+    img = Image.open(BytesIO(r.content)).convert("RGB")
+    if img.width / img.height > w / h:
+        img = img.resize((int(img.width * h / img.height), h))
     else:
-        img = img.resize((W, int(img.height * W / img.width)))
-    left, top = (img.width - W) // 2, (img.height - H) // 2
-    return img.crop((left, top, left + W, top + H))
+        img = img.resize((w, int(img.height * w / img.width)))
+    left, top = (img.width - w) // 2, (img.height - h) // 2
+    return img.crop((left, top, left + w, top + h))
 
 
 def main():
@@ -78,7 +95,7 @@ def main():
         except Exception as e:
             failed += 1
             print(f"[ERR] {ch['name']}: {e}")
-        time.sleep(1)
+        time.sleep(RATE_LIMIT_S)
     print(f"\nDone. new={made} skipped(existing)={skipped} failed={failed}")
 
 

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.llm_cooldown.json
+.llm_last_provider.json
+src/agents/indigo_telegram/_media/
+src/agents/indigo_telegram/test_*.jpg
+src/agents/indigo_telegram/test_*.mp4
+src/agents/indigo_telegram/vtest_*.jpg

@@ -1,0 +1,407 @@
+{
+  "_comment": "16.08.2026 v4: 45 тем, дорогие ниши (Валера явно попросил самые прибыльные, не дешёвые printables). group уже создана и настроена (Indigo Hub, @indigo_hub_valera, Темы включены, AAA Operator — админ).",
+  "group_username": "indigo_hub_valera",
+  "group_chat_id": -1004376915769,
+  "channels": [
+    {
+      "n": 1,
+      "name": "Indigo Deals",
+      "niche": "curated AI/SaaS tool deals with referral links",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 3
+    },
+    {
+      "n": 2,
+      "name": "Indigo Club",
+      "niche": "closed paid community, curated resources and guides",
+      "mechanism": "paid_club",
+      "phase": 1,
+      "topic_id": 5
+    },
+    {
+      "n": 3,
+      "name": "Indigo Quiz",
+      "niche": "daily trivia and quizzes across tech/finance/life",
+      "mechanism": "quiz_funnel",
+      "phase": 1,
+      "topic_id": 6
+    },
+    {
+      "n": 4,
+      "name": "Indigo Jobs",
+      "niche": "remote job and freelance gig board",
+      "mechanism": "paid_pin",
+      "phase": 2,
+      "topic_id": 8
+    },
+    {
+      "n": 5,
+      "name": "Indigo Rent",
+      "niche": "classifieds: services, rentals, local listings",
+      "mechanism": "paid_pin",
+      "phase": 2,
+      "topic_id": 10
+    },
+    {
+      "n": 6,
+      "name": "Indigo PLR",
+      "niche": "resale-rights digital bundles (PLR ebooks, templates)",
+      "mechanism": "stars_product",
+      "phase": 2,
+      "topic_id": 12
+    },
+    {
+      "n": 7,
+      "name": "Indigo Tools",
+      "niche": "AI text & image generation, pay-per-credit",
+      "mechanism": "credit_bot",
+      "phase": 1,
+      "topic_id": 14
+    },
+    {
+      "n": 8,
+      "name": "Indigo Convert",
+      "niche": "free file/unit/currency converter utility bot",
+      "mechanism": "utility_free",
+      "phase": 1,
+      "topic_id": 15
+    },
+    {
+      "n": 9,
+      "name": "Indigo News",
+      "niche": "AI & tech news digest",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 16
+    },
+    {
+      "n": 10,
+      "name": "Indigo Crypto",
+      "niche": "crypto & blockchain news and education (no trading calls)",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 17
+    },
+    {
+      "n": 11,
+      "name": "Indigo Study",
+      "niche": "flashcards and quizzes for students, exam prep",
+      "mechanism": "paid_club",
+      "phase": 1,
+      "topic_id": 18
+    },
+    {
+      "n": 12,
+      "name": "Indigo Loyalty",
+      "niche": "cashback and discount codes for online shopping",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 20
+    },
+    {
+      "n": 13,
+      "name": "Indigo Referral",
+      "niche": "quiz-based navigator into the best-fit partner offer",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 21
+    },
+    {
+      "n": 14,
+      "name": "Indigo Giveaway",
+      "niche": "invite-to-win contests, growth engine for the whole cluster",
+      "mechanism": "viral_growth",
+      "phase": 1,
+      "topic_id": 65
+    },
+    {
+      "n": 15,
+      "name": "Indigo Clicker",
+      "niche": "Telegram Mini App tap game, rewarded ads + Stars cosmetics",
+      "mechanism": "tma_game",
+      "phase": 2,
+      "topic_id": 23
+    },
+    {
+      "n": 16,
+      "name": "Indigo Finance",
+      "niche": "personal budgeting & investing app referrals (tools, not advice)",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 25
+    },
+    {
+      "n": 17,
+      "name": "Indigo Insurance",
+      "niche": "insurance comparison referrals (high payout per lead)",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 27
+    },
+    {
+      "n": 18,
+      "name": "Indigo Legal",
+      "niche": "online legal services referral (wills, contracts, LLC setup)",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 28
+    },
+    {
+      "n": 19,
+      "name": "Indigo VPN",
+      "niche": "VPN & security software affiliate",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 30
+    },
+    {
+      "n": 20,
+      "name": "Indigo Hosting",
+      "niche": "web hosting & domain affiliate",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 32
+    },
+    {
+      "n": 21,
+      "name": "Indigo Software",
+      "niche": "B2B SaaS free-trial referrals",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 35
+    },
+    {
+      "n": 22,
+      "name": "Indigo Mastermind",
+      "niche": "paid business networking/mastermind community",
+      "mechanism": "paid_club",
+      "phase": 2,
+      "topic_id": 37
+    },
+    {
+      "n": 23,
+      "name": "Indigo Health",
+      "niche": "paid wellness & fitness coaching content",
+      "mechanism": "paid_club",
+      "phase": 2,
+      "topic_id": 38
+    },
+    {
+      "n": 24,
+      "name": "Indigo Trivia",
+      "niche": "general knowledge trivia, growth/engagement",
+      "mechanism": "quiz_funnel",
+      "phase": 1,
+      "topic_id": 41
+    },
+    {
+      "n": 25,
+      "name": "Indigo Realty",
+      "niche": "real estate listings board, paid promotion",
+      "mechanism": "paid_pin",
+      "phase": 2,
+      "topic_id": 67
+    },
+    {
+      "n": 26,
+      "name": "Indigo Auto",
+      "niche": "car sales & rental classifieds, paid promotion",
+      "mechanism": "paid_pin",
+      "phase": 2,
+      "topic_id": 69
+    },
+    {
+      "n": 27,
+      "name": "Indigo Events",
+      "niche": "local events & services board, paid promotion",
+      "mechanism": "paid_pin",
+      "phase": 2,
+      "topic_id": 71
+    },
+    {
+      "n": 28,
+      "name": "Indigo Courses",
+      "niche": "resold high-ticket online course bundles (resale rights)",
+      "mechanism": "stars_product",
+      "phase": 2,
+      "topic_id": 43
+    },
+    {
+      "n": 29,
+      "name": "Indigo Templates",
+      "niche": "premium web/app design templates",
+      "mechanism": "stars_product",
+      "phase": 2,
+      "topic_id": 44
+    },
+    {
+      "n": 30,
+      "name": "Indigo Luxury",
+      "niche": "luxury lifestyle guides and planning templates",
+      "mechanism": "stars_product",
+      "phase": 2,
+      "topic_id": 47
+    },
+    {
+      "n": 31,
+      "name": "Indigo Design",
+      "niche": "AI logo & brand design bot, pay-per-credit",
+      "mechanism": "credit_bot",
+      "phase": 1,
+      "topic_id": 49
+    },
+    {
+      "n": 32,
+      "name": "Indigo Copy",
+      "niche": "AI ad-copy & sales copywriting bot, pay-per-credit",
+      "mechanism": "credit_bot",
+      "phase": 1,
+      "topic_id": 51
+    },
+    {
+      "n": 33,
+      "name": "Indigo Resume AI",
+      "niche": "free resume/ATS-check utility bot",
+      "mechanism": "utility_free",
+      "phase": 1,
+      "topic_id": 53
+    },
+    {
+      "n": 34,
+      "name": "Indigo Startup",
+      "niche": "startup & VC funding news digest",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 55
+    },
+    {
+      "n": 35,
+      "name": "Indigo Realty News",
+      "niche": "real estate market news & trends",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 56
+    },
+    {
+      "n": 36,
+      "name": "Indigo Referral Race",
+      "niche": "invite-leaderboard contest driving growth across the cluster",
+      "mechanism": "viral_growth",
+      "phase": 1,
+      "topic_id": 59
+    },
+    {
+      "n": 37,
+      "name": "Indigo Trader Game",
+      "niche": "stock-market simulation clicker game (education, not real trading)",
+      "mechanism": "tma_game",
+      "phase": 2,
+      "topic_id": 61
+    },
+    {
+      "n": 38,
+      "name": "Indigo B2B",
+      "niche": "enterprise software & consulting lead referral",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 62
+    },
+    {
+      "n": 39,
+      "name": "Indigo Wealth",
+      "niche": "wealth-management app referrals (tools, not advice)",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 73
+    },
+    {
+      "n": 40,
+      "name": "Indigo Corporate",
+      "niche": "corporate training & certification referral",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 75
+    },
+    {
+      "n": 41,
+      "name": "Indigo Travel",
+      "niche": "luxury travel deals aggregator",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 77
+    },
+    {
+      "n": 42,
+      "name": "Indigo Fashion",
+      "niche": "designer & luxury fashion deals",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 79
+    },
+    {
+      "n": 43,
+      "name": "Indigo Web3",
+      "niche": "web3 & NFT news and education (no investment advice)",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 81
+    },
+    {
+      "n": 44,
+      "name": "Indigo Coaching",
+      "niche": "high-ticket coaching & consulting lead referral",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 83
+    },
+    {
+      "n": 45,
+      "name": "Indigo Recruiting",
+      "niche": "tech recruiting & placement referral",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 63
+    },
+    {
+      "n": 46,
+      "name": "Indigo Domains",
+      "niche": "domain name investing tips & registrar affiliate",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 175
+    },
+    {
+      "n": 47,
+      "name": "Indigo Grants",
+      "niche": "business grants & funding opportunities digest",
+      "mechanism": "content_aggregator",
+      "phase": 1,
+      "topic_id": 176
+    },
+    {
+      "n": 48,
+      "name": "Indigo Freelance",
+      "niche": "freelance platform tips & referral (Upwork/Fiverr-style)",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 179
+    },
+    {
+      "n": 49,
+      "name": "Indigo Language",
+      "niche": "language-learning app referrals",
+      "mechanism": "cpa_referral",
+      "phase": 2,
+      "topic_id": 181
+    },
+    {
+      "n": 50,
+      "name": "Indigo Productivity",
+      "niche": "productivity & no-code tool referrals (Notion/ClickUp/Zapier-style)",
+      "mechanism": "high_ticket_referral",
+      "phase": 2,
+      "topic_id": 183
+    }
+  ]
+}

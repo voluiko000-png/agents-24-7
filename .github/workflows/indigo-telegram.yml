@@ -1,0 +1,44 @@
+name: Indigo Telegram Cluster - 24/7
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 10:00 MSK
+    - cron: '0 15 * * *'  # 18:00 MSK
+  workflow_dispatch:
+
+jobs:
+  indigo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run Indigo cluster cycle
+        working-directory: src/agents/indigo_telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          SAMBANOVA_API_KEY: ${{ secrets.SAMBANOVA_API_KEY }}
+        run: python run_cycle.py
+
+      - name: Commit new topic images / channel ids back to repo
+        working-directory: src/agents/indigo_telegram
+        run: |
+          git config user.name "indigo-cluster-bot"
+          git config user.email "actions@github.com"
+          git add images channels.json
+          git diff --cached --quiet || git commit -m "auto: indigo cluster cycle update"
+          git push
